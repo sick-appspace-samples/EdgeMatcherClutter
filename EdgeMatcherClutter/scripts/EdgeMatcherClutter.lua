@@ -54,7 +54,9 @@ matcher:setRotationRange(math.pi / 8)
 -- Use clutter level MEDIUM first
 matcher:setBackgroundClutter('MEDIUM')
 -- As the object in this example is relatively small only slight downsampling is possible
-matcher:setDownsampleFactor(4.0)
+local wantedDownsampleFactor = 4.0
+local wantedDownsampleFactorLess = 9.0
+
 -- Find at most 1 object
 matcher:setMaxMatches(1)
 
@@ -63,7 +65,15 @@ matcher:setMaxMatches(1)
 --Start of Function and Event Scope---------------------------------------------
 
 -- Performs a match operation on all images
-local function match()
+local function match(dsf)
+  -- Check if wanted downsample factor is supported by device
+  minDsf,_ = matcher:getDownsampleFactorLimits(teachIm)
+  if (minDsf > dsf) then
+    print("Cannot use downsample factor " .. dsf .. " will use " .. minDsf .. " instead") 
+    dsf = minDsf
+  end
+  matcher:setDownsampleFactor(dsf)
+
   -- Teach the matcher
   local teachPose = matcher:teach(teachIm, teachRegion)
   local modelContours = matcher:getModelContours()
@@ -103,13 +113,12 @@ end
 
 local function main()
   -- Do matching
-  match()
+  match(wantedDownsampleFactor)
   -- Switch to clutter level MEDIUM and re-run
   matcher:setBackgroundClutter('HIGH')
   -- Using less downsampling
-  matcher:setDownsampleFactor(9)
   -- Do matching
-  match()
+  match(wantedDownsampleFactorLess)
   print('App finished.')
 end
 --The following registration is part of the global scope which runs once after startup
