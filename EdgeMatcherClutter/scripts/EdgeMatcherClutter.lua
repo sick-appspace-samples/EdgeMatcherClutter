@@ -5,32 +5,18 @@ print('AppEngine Version: ' .. Engine.getVersion())
 local DELAY = 1000 -- ms between visualization steps for demonstration purpose
 
 -- Creating viewer
-local viewer = View.create('viewer2D1')
+local viewer = View.create()
 
 -- Setting up graphical overlay attributes
-local textDeco = View.TextDecoration.create() -- "Teach" or "Match" mode, top left corner
-textDeco:setSize(30)
-textDeco:setPosition(20, 30)
-
-local text2Deco = View.TextDecoration.create() -- "Number of matches", top right corner
-text2Deco:setSize(30)
-text2Deco:setPosition(520, 30)
-
 local contourDeco = View.ShapeDecoration.create()
-contourDeco:setLineColor(0, 219, 0)
-contourDeco:setLineWidth(3.0)
+contourDeco:setLineColor(0, 219, 0):setLineWidth(3.0)
 
-local regionDec = View.PixelRegionDecoration.create()
-regionDec:setColor(0, 0, 255, 50)
-local shapeDec = View.ShapeDecoration.create()
-shapeDec:setLineColor(0, 100, 255, 255)
-shapeDec:setLineWidth(5.0)
-shapeDec:setPointSize(5)
+local regionDec = View.PixelRegionDecoration.create():setColor(0, 0, 255, 50)
+local shapeDec = View.ShapeDecoration.create():setLineColor(0, 100, 255, 255)
+shapeDec:setLineWidth(5.0):setPointSize(5)
 
-local textDec = View.TextDecoration.create()
-textDec:setColor(0, 255, 0)
-textDec:setSize(40)
-textDec:setPosition(10, 40)
+local textDec = View.TextDecoration.create():setColor(0, 255, 0)
+textDec:setSize(40):setPosition(10, 140)
 
 -- Load images
 local images = {}
@@ -64,12 +50,13 @@ matcher:setMaxMatches(1)
 
 --Start of Function and Event Scope---------------------------------------------
 
--- Performs a match operation on all images
+---Performs a match operation on all images
+---@param dsf int
 local function match(dsf)
   -- Check if wanted downsample factor is supported by device
-  minDsf,_ = matcher:getDownsampleFactorLimits(teachIm)
+  local minDsf,_ = matcher:getDownsampleFactorLimits(teachIm)
   if (minDsf > dsf) then
-    print("Cannot use downsample factor " .. dsf .. " will use " .. minDsf .. " instead") 
+    print("Cannot use downsample factor " .. dsf .. " will use " .. minDsf .. " instead")
     dsf = minDsf
   end
   matcher:setDownsampleFactor(dsf)
@@ -97,8 +84,8 @@ local function match(dsf)
 
     -- Present match
     viewer:clear()
-    local vid = viewer:addImage(images[ii])
-    viewer:addShape(Point.transform(modelPoints, transforms[1]), shapeDec, nil, vid)
+    viewer:addImage(images[ii])
+    viewer:addShape(Point.transform(modelPoints, transforms[1]), shapeDec)
     viewer:addShape(Shape.transform(modelContours, transforms[1]), shapeDec)
     viewer:addText(
       'Clutter level: ' .. matcher:getBackgroundClutter() .. '\nImage: ' ..
